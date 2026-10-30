@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SEO Portfolio Dashboard
 
-## Getting Started
+Pilotage SEO de tous les sites depuis une seule interface (Next.js + Tailwind, déploiement Vercel).
+Statut : interface complète alimentée par des données fictives (`src/lib/mock/data.ts`) — aucune source réelle connectée.
 
-First, run the development server:
+## Lancer
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Navigation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Route | Rubrique | Statut |
+| --- | --- | --- |
+| `/` | Vue globale — KPIs, évolution, classement des sites, points d'attention | MVP |
+| `/sites` | Mes sites — liste des sites | MVP |
+| `/sites/[siteId]` | Fiche site — Vue d'ensemble | MVP |
+| `/sites/[siteId]/performances` | Pages, requêtes, pays, appareils, types de recherche | MVP |
+| `/sites/[siteId]/indexation` | URL indexées / non indexées / anomalies | V2 |
+| `/sites/[siteId]/contenus` | Gagnantes, perdantes, opportunités, publications | MVP |
+| `/sites/[siteId]/historique` | Interventions SEO, déploiements GitHub | V2 |
+| `/contenus` | Pages & contenus — analyse transversale | MVP |
+| `/alertes` | Centre d'alertes (critiques, à surveiller, opportunités) | MVP |
+| `/indexation` | Synthèse indexation multi-sites | V2 |
+| `/semantique` | Suivi sémantique (mots-clés, clusters, concurrents) | Futur |
+| `/parametres` | Sites, connexions, règles d'alerte, santé des données | MVP |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Arborescence
 
-## Learn More
+```
+src/
+├── app/
+│   ├── layout.tsx                 # racine (html, fonts)
+│   └── (dashboard)/
+│       ├── layout.tsx             # sidebar + zone de contenu
+│       ├── page.tsx               # Vue globale
+│       ├── sites/
+│       │   ├── page.tsx
+│       │   └── [siteId]/
+│       │       ├── layout.tsx     # en-tête + onglets du site
+│       │       ├── SiteTabs.tsx
+│       │       ├── page.tsx
+│       │       ├── performances/ indexation/ contenus/ historique/
+│       ├── contenus/ alertes/ indexation/ semantique/ parametres/
+├── components/
+│   ├── layout/   # TopNav (menu horizontal), PeriodSwitch (7/28/90j), PageHeader
+│   ├── charts/   # TrendChart, Sparkline, ShareDonut, Base100Chart, BarsChart (Recharts)
+│   ├── metrics/  # KpiCard
+│   ├── sites/ tables/ alerts/
+│   └── ui/       # Card, DeltaBadge, StatusPill, Block (placeholders V2/futur)
+├── config/navigation.ts   # menu principal + onglets site
+├── lib/
+│   ├── analytics/metrics.ts   # CTR, position pondérée, variations, base 100
+│   ├── mock/data.ts           # données fictives (à remplacer par BigQuery)
+│   ├── period.ts              # gestion de la période (?period=7|28|90)
+│   ├── bigquery/  database/  alerts/
+└── types/index.ts
+sql/{staging,marts,monitoring}/   # transformations BigQuery (dataset seo_portfolio)
+supabase/migrations/              # base applicative (sites, sources, alertes)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Règles de calcul
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- CTR = Σ clics / Σ impressions
+- Position moyenne = 1 + Σ sum_top_position / Σ impressions (jamais de moyenne de moyennes)
+- Variation = (actuel − précédent) / précédent × 100, `null` si précédent = 0
