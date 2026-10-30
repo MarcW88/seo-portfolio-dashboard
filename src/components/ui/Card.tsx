@@ -42,11 +42,12 @@ export function DeltaBadge({ value, label, invert = false }: { value: number | n
   );
 }
 
-export function StatusPill({ tone, children }: { tone: "v2" | "futur" | "mock"; children: React.ReactNode }) {
+export function StatusPill({ tone, children }: { tone: "v2" | "futur" | "mock" | "live"; children: React.ReactNode }) {
   const styles = {
     v2: "bg-amber-400/10 text-amber-300 ring-amber-400/20",
     futur: "bg-fuchsia-400/10 text-fuchsia-300 ring-fuchsia-400/20",
     mock: "bg-sky-400/10 text-sky-300 ring-sky-400/20",
+    live: "bg-emerald-400/10 text-emerald-300 ring-emerald-400/20",
   };
   return <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${styles[tone]}`}>{children}</span>;
 }

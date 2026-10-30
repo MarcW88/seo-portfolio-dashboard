@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, GitCompare } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { StatusPill } from "@/components/ui/Card";
-import { getSite } from "@/lib/mock/data";
+import { getSite } from "@/lib/data";
+import { DataBadge } from "@/components/ui/DataBadge";
 import { SiteTabs } from "./SiteTabs";
 
 export default async function SiteLayout({
@@ -15,7 +15,7 @@ export default async function SiteLayout({
   params: Promise<{ siteId: string }>;
 }) {
   const { siteId } = await params;
-  const site = getSite(siteId);
+  const site = await getSite(siteId);
   if (!site) notFound();
   return (
     <>
@@ -26,7 +26,7 @@ export default async function SiteLayout({
         eyebrow={
           <>
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: site.color, boxShadow: `0 0 12px ${site.color}` }} />
-            <StatusPill tone="mock">Données fictives</StatusPill>
+            <DataBadge />
           </>
         }
         title={site.name}

@@ -1,12 +1,13 @@
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Card, CardHeader, StatusPill } from "@/components/ui/Card";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { DataBadge } from "@/components/ui/DataBadge";
 import { PageTable } from "@/components/tables/PageTable";
 import { parsePeriod, type PeriodSearchParams } from "@/lib/period";
-import { allPages } from "@/lib/mock/data";
+import { getAllPages } from "@/lib/data";
 
 export default async function ContentsPage({ searchParams }: { searchParams: PeriodSearchParams }) {
   const period = parsePeriod((await searchParams).period);
-  const pages = allPages(period);
+  const pages = await getAllPages(period);
   const byDelta = [...pages].sort((a, b) => b.clicks - b.prevClicks - (a.clicks - a.prevClicks));
   const opportunities = pages.filter((p) => p.position > 3 && p.position <= 10).sort((a, b) => b.impressions - a.impressions);
   const rising = pages.filter((p) => p.prevClicks > 0 && p.clicks / p.prevClicks > 1.3).sort((a, b) => b.clicks / b.prevClicks - a.clicks / a.prevClicks);
@@ -14,7 +15,7 @@ export default async function ContentsPage({ searchParams }: { searchParams: Per
   return (
     <>
       <PageHeader
-        eyebrow={<StatusPill tone="mock">Données fictives</StatusPill>}
+        eyebrow={<DataBadge />}
         title="Pages & contenus"
         description={`${pages.length} URL analysées sur tous les sites · ${period} derniers jours`}
       />

@@ -1,7 +1,7 @@
-import { indexationMock } from "@/lib/mock/data";
+import { getIndexation } from "@/lib/data";
 
 export function IndexationSummary({ slug }: { slug: string }) {
-  const { total, indexed, pending, issues } = indexationMock(slug);
+  const { total, indexed, pending, issues } = getIndexation(slug);
   const parts = [
     { label: "Indexées", value: indexed, color: "bg-emerald-400" },
     { label: "À vérifier", value: pending, color: "bg-amber-400" },

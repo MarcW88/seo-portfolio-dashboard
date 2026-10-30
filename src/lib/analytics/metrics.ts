@@ -11,7 +11,7 @@ export function sumRaw(rows: RawMetrics[]): RawMetrics {
   );
 }
 
-// GSC sum_top_position is zero-based: avg position = 1 + SUM(position_sum) / SUM(impressions)
+// GSC sum_position is zero-based: avg position = 1 + SUM(position_sum) / SUM(impressions)
 export function toMetrics({ clicks, impressions, positionSum }: RawMetrics): Metrics {
   return {
     clicks,

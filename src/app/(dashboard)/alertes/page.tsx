@@ -1,12 +1,13 @@
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Card, CardHeader, StatusPill } from "@/components/ui/Card";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { DataBadge } from "@/components/ui/DataBadge";
 import { AlertList, SEVERITY } from "@/components/alerts/AlertList";
 import { parsePeriod, type PeriodSearchParams } from "@/lib/period";
-import { alerts } from "@/lib/mock/data";
+import { getAlerts } from "@/lib/data";
 
 export default async function AlertsPage({ searchParams }: { searchParams: PeriodSearchParams }) {
   const period = parsePeriod((await searchParams).period);
-  const all = alerts(period);
+  const all = await getAlerts(period);
   const groups = (Object.keys(SEVERITY) as (keyof typeof SEVERITY)[]).map((k) => ({
     key: k,
     ...SEVERITY[k],
@@ -16,7 +17,7 @@ export default async function AlertsPage({ searchParams }: { searchParams: Perio
   return (
     <>
       <PageHeader
-        eyebrow={<StatusPill tone="mock">Données fictives</StatusPill>}
+        eyebrow={<DataBadge />}
         title="Alertes"
         description="Ce qui nécessite ton attention, du plus urgent aux opportunités."
       />

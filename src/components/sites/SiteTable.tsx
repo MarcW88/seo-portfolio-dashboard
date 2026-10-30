@@ -3,9 +3,19 @@ import { ChevronRight } from "lucide-react";
 import { Sparkline } from "@/components/charts/Sparkline";
 import { DeltaBadge } from "@/components/ui/Card";
 import { fmtCompact, fmtCtr, fmtDelta, fmtInt, fmtPos } from "@/lib/format";
-import type { siteRows } from "@/lib/mock/data";
+import type { Metrics } from "@/types";
 
-export function SiteTable({ rows, period }: { rows: ReturnType<typeof siteRows>; period: number }) {
+export type SiteRow = {
+  slug: string;
+  name: string;
+  domain: string;
+  color: string;
+  current: Metrics;
+  change: { clicks: number | null; impressions: number | null; ctr: number | null; position: number | null };
+  spark: { v: number }[];
+};
+
+export function SiteTable({ rows, period }: { rows: SiteRow[]; period: number }) {
   const max = Math.max(...rows.map((r) => r.current.clicks));
   return (
     <div className="-mx-5 overflow-x-auto">

@@ -9,7 +9,7 @@ import { AlertList } from "@/components/alerts/AlertList";
 import { IndexationSummary } from "@/components/sites/IndexationSummary";
 import { fmtCompact, fmtCtr, fmtDelta, fmtPos } from "@/lib/format";
 import { parsePeriod, type PeriodSearchParams } from "@/lib/period";
-import { alerts, compare, getSite, positionBuckets, sitePages, sparkline, trendSeries } from "@/lib/mock/data";
+import { compare, getAlerts, getPositionBuckets, getSite, getSitePages, sparkline, trendSeries } from "@/lib/data";
 
 export default async function SiteOverviewPage({
   params,
@@ -20,11 +20,15 @@ export default async function SiteOverviewPage({
 }) {
   const { siteId } = await params;
   const period = parsePeriod((await searchParams).period);
-  const site = getSite(siteId) ?? notFound();
+  const site = await getSite(siteId);
+  if (!site) notFound();
+  const [pages, buckets, siteAlerts] = await Promise.all([
+    getSitePages(siteId, period),
+    getPositionBuckets(siteId, period),
+    getAlerts(period).then((all) => all.filter((a) => a.siteSlug === siteId)),
+  ]);
   const { current, change } = compare(site.daily, period);
-  const pages = sitePages(siteId, period);
   const byDelta = [...pages].sort((a, b) => b.clicks - b.prevClicks - (a.clicks - a.prevClicks));
-  const siteAlerts = alerts(period).filter((a) => a.siteSlug === siteId);
 
   return (
     <>
@@ -44,7 +48,7 @@ export default async function SiteOverviewPage({
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader title="Distribution des positions" subtitle="Nombre de pages par tranche" />
-            <BarsChart data={positionBuckets(siteId, period)} dataKey="pages" name="Pages" colors={["#34d399", "#22d3ee", "#818cf8", "#475569"]} height={160} />
+            <BarsChart data={buckets} dataKey="pages" name="Pages" colors={["#34d399", "#22d3ee", "#818cf8", "#475569"]} height={160} />
           </Card>
           <Card>
             <CardHeader title="Indexation connue" subtitle="Échantillon inspecté · module V2" />

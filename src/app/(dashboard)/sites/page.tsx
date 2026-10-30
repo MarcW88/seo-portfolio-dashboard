@@ -2,24 +2,25 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Sparkline } from "@/components/charts/Sparkline";
-import { DeltaBadge, StatusPill } from "@/components/ui/Card";
+import { DeltaBadge } from "@/components/ui/Card";
+import { DataBadge } from "@/components/ui/DataBadge";
 import { fmtCompact, fmtCtr, fmtDelta, fmtPos } from "@/lib/format";
 import { parsePeriod, type PeriodSearchParams } from "@/lib/period";
-import { indexationMock, siteRows } from "@/lib/mock/data";
+import { getIndexation, getSiteRows } from "@/lib/data";
 
 export default async function SitesPage({ searchParams }: { searchParams: PeriodSearchParams }) {
   const period = parsePeriod((await searchParams).period);
-  const rows = siteRows(period);
+  const rows = await getSiteRows(period);
   return (
     <>
       <PageHeader
-        eyebrow={<StatusPill tone="mock">Données fictives</StatusPill>}
+        eyebrow={<DataBadge />}
         title="Mes sites"
         description={`${rows.length} sites suivis · ${period} derniers jours`}
       />
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {rows.map((r) => {
-          const idx = indexationMock(r.slug);
+          const idx = getIndexation(r.slug);
           const trend = (r.change.clicks ?? 0) > 5 ? "En croissance" : (r.change.clicks ?? 0) < -5 ? "En baisse" : "Stable";
           return (
             <Link

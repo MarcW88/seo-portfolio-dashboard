@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { TopNav } from "@/components/layout/TopNav";
-import { alerts } from "@/lib/mock/data";
+import { getAlerts } from "@/lib/data";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const openAlerts = alerts(28).filter((a) => a.severity === "critical" || a.severity === "warning").length;
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const openAlerts = (await getAlerts(28)).filter((a) => a.severity === "critical" || a.severity === "warning").length;
   return (
     <div className="relative min-h-screen">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">

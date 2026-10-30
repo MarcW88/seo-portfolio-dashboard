@@ -2,10 +2,11 @@ import Link from "next/link";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardHeader, StatusPill } from "@/components/ui/Card";
 import { BarsChart } from "@/components/charts/BarsChart";
-import { SITES, indexationMock } from "@/lib/mock/data";
+import { getIndexation, getSites } from "@/lib/data";
 
-export default function IndexationPage() {
-  const rows = SITES.map((s) => ({ ...s, ...indexationMock(s.slug) }));
+export default async function IndexationPage() {
+  const sites = await getSites();
+  const rows = sites.map((s) => ({ ...s, ...getIndexation(s.slug) }));
   const chart = rows.map((r) => ({ label: r.name.split(" ")[0], taux: Math.round((r.indexed / r.total) * 100) }));
 
   return (
