@@ -163,9 +163,11 @@ export async function getAlerts(period: number): Promise<MockAlert[]> {
       out.push({ id: `empty-${s.slug}`, severity: "warning", title: "Aucune donnée reçue", detail: "Export GSC configuré mais vide", site: s.name, siteSlug: s.slug, date: "—" });
       continue;
     }
-    const last = s.lastDataDate ? new Date(s.lastDataDate) : null;
-    if (last && Date.now() - last.getTime() > 3 * 24 * 3600 * 1000) {
-      out.push({ id: `stale-${s.slug}`, severity: "warning", title: "Export BigQuery en retard", detail: `Dernière journée : ${s.lastDataDate}`, site: s.name, siteSlug: s.slug, date: s.lastDataDate ?? "—" });
+    // L'export GSC a un délai naturel de ~2 jours : on n'alerte qu'au-delà de 4 jours sans nouvelle donnée.
+    const last = s.lastDataDate ? new Date(`${s.lastDataDate}T00:00:00Z`) : null;
+    if (last && Date.now() - last.getTime() > 4 * 24 * 3600 * 1000) {
+      const days = Math.floor((Date.now() - last.getTime()) / (24 * 3600 * 1000));
+      out.push({ id: `stale-${s.slug}`, severity: "warning", title: "Export BigQuery en retard", detail: `Dernière journée : ${s.lastDataDate} (il y a ${days} j)`, site: s.name, siteSlug: s.slug, date: s.lastDataDate ?? "—" });
     }
     if (ch !== null && ch <= -25 && s.previous.clicks >= 50) {
       out.push({ id: `drop-${s.slug}`, severity: "critical", title: "Baisse de clics inhabituelle", detail: `${ch.toFixed(1)} % vs période précédente`, site: s.name, siteSlug: s.slug, date: "en cours" });
